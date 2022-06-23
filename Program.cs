@@ -1,6 +1,4 @@
 using System.Text.Json;
-using System.Collections.Specialized;
-using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,26 +56,27 @@ app.MapGet("/act_per_alarm", () =>
     {
         /* unsure of how necessary try-catch is here. presumably any event in the alarmlog
            should have a valid AlarmID, but adding it in just to be sure */
-        try {
-        var alarmID = alarms.FirstOrDefault(a => a.AlarmId == item.AlarmId).AlarmId;
-        var stationName = alarms.FirstOrDefault(a => a.AlarmId == item.AlarmId).Station;
-        var alarmText = alarms.FirstOrDefault(a => a.AlarmId == item.AlarmId).AlarmText;
-        // check if the alarm exists in the list and, if not, add it
-        if (!activations.Any(x => x.AlarmID == alarmID))
+        try
         {
-            activations.Add(new ActivationReturnObject
+            var alarmID = alarms.FirstOrDefault(a => a.AlarmId == item.AlarmId).AlarmId;
+            var stationName = alarms.FirstOrDefault(a => a.AlarmId == item.AlarmId).Station;
+            var alarmText = alarms.FirstOrDefault(a => a.AlarmId == item.AlarmId).AlarmText;
+            // check if the alarm exists in the list and, if not, add it
+            if (!activations.Any(x => x.AlarmID == alarmID))
             {
-                AlarmID = alarmID,
-                Station = stationName,
-                Label = alarmText,
-                Count = 1
-            });
-        }
-        // otherwise, just iterate the count
-        else
-        {
-            activations.FirstOrDefault(x => x.AlarmID == alarmID).Count++;
-        }
+                activations.Add(new ActivationReturnObject
+                {
+                    AlarmID = alarmID,
+                    Station = stationName,
+                    Label = alarmText,
+                    Count = 1
+                });
+            }
+            // otherwise, just iterate the count
+            else
+            {
+                activations.FirstOrDefault(x => x.AlarmID == alarmID).Count++;
+            }
         }
         catch (NullReferenceException ex)
         {
@@ -90,17 +89,19 @@ app.MapGet("/act_per_alarm", () =>
 .WithName("Act_per_alarm");
 
 
-
 app.MapGet("/act_per_station", () =>
 {
-    // if we have a large number of stations, a hashtable might be in order instead
-    // but with the current sample data, ListDictionary seems fine
+    /* if we have a large number of stations, a hashtable might be in order instead
+       but with the current sample data, ListDictionary seems fine.
+       I was really all in on a dictionary for this but now I'm thinking maybe we should
+       return a list of objects instead, just for the sake of it. still, this seems appropriate
+       given that we're just listing a key (station) and a value (activations) */
     SortedList<string, int> stationList = new SortedList<string, int>();
     foreach (var item in alarmLog)
     {
-        // use AlarmID to fetch the station name from the alarms list
         try
         {
+            // use AlarmID to fetch the station name from the alarms list
             var stationName = alarms.FirstOrDefault(a => a.AlarmId == item.AlarmId).Station;
             if (stationList.ContainsKey(stationName))
             {

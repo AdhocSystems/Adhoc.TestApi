@@ -96,5 +96,12 @@
         "AlarmNumber": 994,
         "AlarmClass": "E",
         "AlarmText": "Event number 994 is undefined"
+    },
+    {
+        "AlarmId": 3333,
+        "Station": "Second test station",
+        "AlarmNumber": 3333,
+        "AlarmClass": "E",
+        "AlarmText": "Event number 994 is undefined"
     }
 ]

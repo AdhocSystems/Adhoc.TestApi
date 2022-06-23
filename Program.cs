@@ -56,6 +56,8 @@ app.MapGet("/act_per_alarm", () =>
 
     foreach (var item in alarmLog)
     {
+        /* unsure of how necessary try-catch is here. presumably any event in the alarmlog
+           should have a valid AlarmID, but adding it in just to be sure */
         try {
         var alarmID = alarms.FirstOrDefault(a => a.AlarmId == item.AlarmId).AlarmId;
         var stationName = alarms.FirstOrDefault(a => a.AlarmId == item.AlarmId).Station;
@@ -103,16 +105,12 @@ app.MapGet("/act_per_station", () =>
             if (stationList.ContainsKey(stationName))
             {
                 stationList[stationName]++;
-                Console.WriteLine(stationList);
             }
             else
             {
                 stationList.Add(stationName, 1);
-                Console.WriteLine(stationList);
             }
         }
-        // should the function check for null objects as part of the if-else bit?
-        // or does that add nothing beyond what the try-catch does?
         catch (NullReferenceException ex)
         {
             Console.WriteLine("NullReferenceException: Unable to match activation to an existing station");
